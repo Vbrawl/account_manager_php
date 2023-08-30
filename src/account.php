@@ -6,16 +6,16 @@ namespace ACCOUNT_MANAGER {
 
     class Account {
 
-        private $id = null;
-        private $username = null;
-        private $password = null;
-        private $birthdate = null;
-        private $email = null;
-        private $mobile = null;
-        private $privacy_status = 'private';
-        private $db = null;
+        private ?int $id;
+        private string $username;
+        private string $password;
+        private ?string $birthdate;
+        private ?string $email;
+        private ?string $mobile;
+        private string $privacy_status;
+        private Database $db;
 
-        function __construct($db, $username, $password, $birthdate = null, $email = null, $mobile = null, $privacy_status = 'private', $id = null) {
+        function __construct(Database $db, string $username, string $password, ?string $birthdate = null, ?string $email = null, ?string $mobile = null, string $privacy_status = 'private', ?int $id = null) {
             $this->db = $db;
             $this->id = $id;
             $this->username = $username;
@@ -26,53 +26,53 @@ namespace ACCOUNT_MANAGER {
             $this->privacy_status = $privacy_status;
         }
 
-        function add() {
-            $id = $this->db->add_account($this->username, $this->password, $this->birthdate, $this->email, $this->mobile, $this->privacy_status);
+        function add() : ?int {
+            $id = $this->db->register_account($this->username, $this->password, $this->birthdate, $this->email, $this->mobile, $this->privacy_status);
             if($id) $this->id = $id;
             return $id;
         }
 
-        function delete() {
+        function delete() : bool {
             return $this->db->delete_account($this->id, $this->password);
         }
 
-        function get_permissions($permission_name = '%') {
+        function get_permissions(string $permission_name = '%') : ?PermissionResults {
             return $this->db->get_account_permissions($this->id, $permission_name);
         }
 
-        function set_permission($permission_name, $value) {
+        function set_permission(string $permission_name, int $value) : bool {
             return $this->db->set_account_permission($this->id, $permission_name, $value);
         }
 
-        function get_id() {
+        function get_id() : ?int {
             return $this->id;
         }
 
-        function get_username() {
+        function get_username() : string {
             return $this->username;
         }
 
-        function get_password() {
+        function get_password() : string {
             return $this->password;
         }
 
-        function get_birthdate() {
+        function get_birthdate() : ?string {
             return $this->birthdate;
         }
 
-        function get_email() {
+        function get_email() : ?string {
             return $this->email;
         }
 
-        function get_mobile() {
+        function get_mobile() : ?string {
             return $this->mobile;
         }
 
-        function get_privacy_status() {
+        function get_privacy_status() : string {
             return $this->privacy_status;
         }
 
-        function get_db() {
+        function get_db() : Database {
             return $this->db;
         }
 
@@ -81,17 +81,18 @@ namespace ACCOUNT_MANAGER {
 
     class AccountResults {
 
-        private $results = null;
-        private $db = null;
+        private \DATABASE_ADAPTER\RESULTAdapter $results;
+        private Database $db;
 
-        function __construct($db, $results) {
+        function __construct(Database $db, \DATABASE_ADAPTER\RESULTAdapter $results) {
             $this->db = $db;
             $this->results = $results;
         }
 
-        function getAccount() {
+        function getAccount() : ?Account {
             $row = $this->results->getRowA();
-            return new Account($this->db, $row["username"], $row["password"], $row["birthdate"], $row["email"], $row["mobile"], $row["privacy_status"], $row["id"]);
+            if($row)
+                return new Account($this->db, $row["username"], $row["password"], $row["birthdate"], $row["email"], $row["mobile"], $row["privacy_status"], $row["id"]);
         }
     }
 
