@@ -28,13 +28,13 @@ namespace ACCOUNT_MANAGER {
 
         function serialize() {
             return array(
-                'id' => $id,
-                'username' => $username,
-                'password' => $password,
-                'birthdate' => $birthdate,
-                'email' => $email,
-                'mobile' => $mobile,
-                'privacy_status' => $privacy_status
+                'id' => $this->id,
+                'username' => $this->username,
+                'password' => $this->password,
+                'birthdate' => $this->birthdate,
+                'email' => $this->email,
+                'mobile' => $this->mobile,
+                'privacy_status' => $this->privacy_status
             );
         }
 
