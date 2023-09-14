@@ -26,6 +26,29 @@ namespace ACCOUNT_MANAGER {
             $this->privacy_status = $privacy_status;
         }
 
+        function serialize() {
+            return array(
+                'id' => $id,
+                'username' => $username,
+                'password' => $password,
+                'birthdate' => $birthdate,
+                'email' => $email,
+                'mobile' => $mobile,
+                'privacy_status' => $privacy_status
+            );
+        }
+
+        function deserialize(Database $db, $data) {
+            $this->db = $db;
+            $this->id = $data['id'];
+            $this->username = $data['username'];
+            $this->password = $data['password'];
+            $this->birthdate = $data['birthdate'];
+            $this->email = $data['email'];
+            $this->mobile = $data['mobile'];
+            $this->privacy_status = $data['privacy_status'];
+        }
+
         function add() : ?int {
             $id = $this->db->register_account($this->username, $this->password, $this->birthdate, $this->email, $this->mobile, $this->privacy_status);
             if($id) $this->id = $id;
@@ -93,6 +116,7 @@ namespace ACCOUNT_MANAGER {
             $row = $this->results->getRowA();
             if($row)
                 return new Account($this->db, $row["username"], $row["password"], $row["birthdate"], $row["email"], $row["mobile"], $row["privacy_status"], $row["id"]);
+            return null;
         }
     }
 
