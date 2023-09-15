@@ -68,6 +68,14 @@ namespace ACCOUNT_MANAGER {
             }
         }
 
+        function get_account(int $id) {
+            if(!$this->db->isConnected()) $this->db->connect();
+            $res = $this->db->queryPrepared('SELECT * FROM `accounts` WHERE id=:id', array(':id' => $id));
+            if($res) {
+                return (new AccountResults($this, $res))->getAccount();
+            }
+        }
+
         function delete_account(int $id, string $password, string $offset_days = '+30 days') : bool {
             if(!$this->db->isConnected()) $this->db->connect();
             $res = $this->db->execPrepared('UPDATE `accounts` SET `delete_on` = DATE("now", :offdays) WHERE `id` = :id AND `password` = :password;', array(':id' => $id, ':password' => $password, ':offdays' => $offset_days));
