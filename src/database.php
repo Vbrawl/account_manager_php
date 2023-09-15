@@ -29,7 +29,8 @@ namespace ACCOUNT_MANAGER {
                 email TEXT UNIQUE,
                 mobile TEXT UNIQUE,
                 privacy_status TEXT NOT NULL DEFAULT "private",
-                delete_on TEXT DEFAULT NULL
+                creation_date DATETIME DEFAULT CURRENT_TIMESTAMP,
+                deletion_date DATETIME DEFAULT NULL
             );');
 
             $this->db->exec('CREATE TABLE IF NOT EXISTS permissions (
@@ -59,9 +60,11 @@ namespace ACCOUNT_MANAGER {
 
         function login_account(string $username_or_email, string $password) : ?Account {
             if(!$this->db->isConnected()) $this->db->connect();
-            $res = $this->db->queryPrepared('SELECT * FROM `accounts` WHERE (`username` = :uoe OR `email` = :uoe) AND `password` = :password;', array(':uoe' => $username_or_email, ':password' => $password));
+            $res = $this->db->queryPrepared('SELECT * FROM `accounts` WHERE (`username` = :uoe OR `email` = :uoe) AND `password` = :password AND deletion_date > datetime("now");', array(':uoe' => $username_or_email, ':password' => $password));
             if($res) {
-                return (new AccountResults($this, $res))->getAccount();
+                $account = (new AccountResults($this, $res))->getAccount();
+                $this->db->execPrepared('UPDATE `accounts` SET deletion_date = NULL WHERE id=:id', array(':id' => $account->get_id()));
+                return $account;
             }
         }
 

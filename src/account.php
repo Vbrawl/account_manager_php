@@ -34,7 +34,8 @@ namespace ACCOUNT_MANAGER {
                 'birthdate' => $this->birthdate,
                 'email' => $this->email,
                 'mobile' => $this->mobile,
-                'privacy_status' => $this->privacy_status
+                'privacy_status' => $this->privacy_status,
+                'creation_date' => $this->creation_date
             );
         }
 
@@ -47,6 +48,7 @@ namespace ACCOUNT_MANAGER {
             $this->email = $data['email'];
             $this->mobile = $data['mobile'];
             $this->privacy_status = $data['privacy_status'];
+            $this->creation_date = $data['creation_date'];
         }
 
         function add() : ?int {
@@ -55,8 +57,8 @@ namespace ACCOUNT_MANAGER {
             return $id;
         }
 
-        function delete() : bool {
-            return $this->db->delete_account($this->id, $this->password);
+        function delete(bool $immediately = false) : bool {
+            return $this->db->delete_account($this->id, $this->password, ($immediately ? '-1 seconds' : "+30 days"));
         }
 
         function get_permissions(string $permission_name = '%') : ?PermissionResults {
