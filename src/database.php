@@ -69,12 +69,27 @@ namespace ACCOUNT_MANAGER {
             }
         }
 
+        function login_account_by_id(int $id) {
+            if(!$this->db->isConnected()) $this->db->connect();
+            $account = $this->get_account($id);
+            if($account !== null) {
+                $this->db->execPrepared('UPDATE `accounts` SET deletion_date = NULL WHERE id=:id;', array(':id' => $account->get_id()));
+            }
+            return $account;
+        }
+
         function get_account(int $id) {
             if(!$this->db->isConnected()) $this->db->connect();
             $res = $this->db->queryPrepared('SELECT * FROM `accounts` WHERE id=:id', array(':id' => $id));
             if($res) {
                 return (new AccountResults($this, $res))->getAccount();
             }
+        }
+
+        function get_account_for_login(string $username_or_email) : ?Account {
+            if(!$this->db->isConnected()) $this->db->connect();
+            $res = $this->db->queryPrepared('SELECT * FROM `accounts` WHERE (`username` = :uoe OR `email` = :uoe) AND (deletion_date IS NULL OR deletion_date > datetime("now"));', array(':uoe' => $username_or_email));
+            return new AccountResults($this, $res);
         }
 
         function delete_account(int $id, string $password, string $offset_days = '+30 days') : bool {
