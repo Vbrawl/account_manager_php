@@ -86,7 +86,7 @@ namespace ACCOUNT_MANAGER {
             }
         }
 
-        function get_account_for_login(string $username_or_email) : ?Account {
+        function get_account_for_login(string $username_or_email) : ?AccountResults {
             if(!$this->db->isConnected()) $this->db->connect();
             $res = $this->db->queryPrepared('SELECT * FROM `accounts` WHERE (`username` = :uoe OR `email` = :uoe) AND (deletion_date IS NULL OR deletion_date > datetime("now"));', array(':uoe' => $username_or_email));
             return new AccountResults($this, $res);
